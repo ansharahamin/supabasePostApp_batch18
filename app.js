@@ -2,9 +2,8 @@ let supabaseUrl = 'https://phgbkzvxbefidcrtagbt.supabase.co'
 let supabaseKey = 'sb_publishable_xbv5T3RlyRtRymBO3pY69A_lTr1vU0s'
 var supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
 window.onload = async function(){
-const { data, error } = await supabase
-  .from('Post App Table')
-  .select('*')
+try {
+  const { data, error } = await supabase.from('Post App Table').select('*').order('id', { ascending: false })
   console.log(data, error);
   if(error){
     Swal.fire({
@@ -12,9 +11,37 @@ const { data, error } = await supabase
   title: "Oops...",
   text: "Something went wrong with fetching data from database!",
 });
-  }else{
-
   }
+  data.forEach(post => {
+    var posts = document.getElementById("posts")
+          
+    posts.innerHTML += `
+    <div class="card mb-2">
+             <div class="card-header">${post.id} ~Post</div>
+             <div style="background-image:url(${post.img_bg})" class="card-body">
+               <figure>
+                 <blockquote class="blockquote">
+                   <p>
+                     ${post.title}
+                   </p>
+                 </blockquote>
+                 <figcaption class="blockquote-footer">
+                   ${post.description}
+                 </figcaption>
+               </figure>
+             </div>
+             <div class="ms-auto m-2">
+             <button onclick="editPost()" class="btn btn-success">Edit</button>
+             <button onclick="deletePost()" class="btn btn-danger">Delete</button>
+             </div>
+           </div>
+   `
+  });
+} catch (error) {
+  console.log('error');
+}
+
+
 }
 
 var cardBg 
@@ -31,27 +58,38 @@ function editPost(){
     card.remove()
   console.log(title, description);
 }
-function post(){
+async function post(){
     var title = document.getElementById("title")
     var description = document.getElementById("description")
     console.log(title.value , description.value);
     var posts = document.getElementById("posts")
    if(title.value.trim() && description.value.trim()){
-        data.forEach(post =>{
-      //  var postContainer = document.querySelector('#posts')
-      //  postContainer
+try {
+  const { data, error } = await supabase
+  .from('Post App Table')
+  .insert({ title: title.value, description: description.value, img_bg:cardBg })
+  .select('*')
+  window.location.reload()
+  if (error) {
+    console.log(error);
+  }
+      
+} catch (error) {
+  console.log(error);
+}
+   
        posts.innerHTML += `
      <div class="card mb-2">
               <div class="card-header">~Post</div>
-              <div style="background-image:url(${[post.img-bg]})" class="card-body">
+              <div style="background-image:url(${cardBg})" class="card-body">
                 <figure>
                   <blockquote class="blockquote">
                     <p>
-                      ${post.title}
+                      ${title.value}
                     </p>
                   </blockquote>
                   <figcaption class="blockquote-footer">
-                    ${post.description}
+                    ${description.value}
                   </figcaption>
                 </figure>
               </div>
@@ -61,7 +99,7 @@ function post(){
               </div>
             </div>
     `
-    })
+   
     
    }else{
     Swal.fire({
