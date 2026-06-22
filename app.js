@@ -1,21 +1,23 @@
 let supabaseUrl = 'https://phgbkzvxbefidcrtagbt.supabase.co'
 let supabaseKey = 'sb_publishable_xbv5T3RlyRtRymBO3pY69A_lTr1vU0s'
 var supabase = window.supabase.createClient(supabaseUrl, supabaseKey)
-window.onload = async function(){
-try {
-  const { data, error } = await supabase.from('Post App Table').select('*').order('id', { ascending: false })
-  console.log(data, error);
-  if(error){
-    Swal.fire({
-  icon: "error",
-  title: "Oops...",
-  text: "Something went wrong with fetching data from database!",
-});
-  }
-  data.forEach(post => {
-    var posts = document.getElementById("posts")
-          
-    posts.innerHTML += `
+var cardBg;
+var editId = null;
+window.onload = async function () {
+  try {
+    const { data, error } = await supabase.from('Post App Table').select('*').order('id', { ascending: false })
+    console.log(data, error);
+    if (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Something went wrong with fetching data from database!",
+      });
+    }
+    data.forEach(post => {
+      var posts = document.getElementById("posts")
+
+      posts.innerHTML += `
     <div class="card mb-2">
              <div class="card-header">${post.id} ~Post</div>
              <div style="background-image:url(${post.img_bg})" class="card-body">
@@ -31,54 +33,84 @@ try {
                </figure>
              </div>
              <div class="ms-auto m-2">
-             <button onclick="editPost()" class="btn btn-success">Edit</button>
-             <button onclick="deletePost()" class="btn btn-danger">Delete</button>
+             <button onclick="editPost(event,${post.id})" class="btn btn-success">Edit</button>
+             <button onclick="deletePost(event,${post.id})" class="btn btn-danger">Delete</button>
              </div>
            </div>
    `
-  });
-} catch (error) {
-  console.log('error');
-}
+    });
+  } catch (error) {
+    console.log('error');
+  }
 
 
 }
 
-var cardBg 
-function deletePost(){
+
+async function deletePost(event, id) {
   var card = event.target.parentNode.parentNode
   card.remove()
-}
-function editPost(){
-    var card = event.target.parentNode.parentNode
-    var title =card.children[1].children[0].children[0].children[0].innerText
-    var description =card.children[1].children[0].children[1].innerText
-    document.getElementById("title").value = title
-    document.getElementById("description").value = description
-    card.remove()
-  console.log(title, description);
-}
-async function post(){
-    var title = document.getElementById("title")
-    var description = document.getElementById("description")
-    console.log(title.value , description.value);
-    var posts = document.getElementById("posts")
-   if(title.value.trim() && description.value.trim()){
-try {
-  const { data, error } = await supabase
-  .from('Post App Table')
-  .insert({ title: title.value, description: description.value, img_bg:cardBg })
-  .select('*')
-  window.location.reload()
-  if (error) {
+  try {
+    const { data, error } = await supabase.from('Post App Table').delete().eq('id', id)
+    if (error) {
+      console.log(error);
+    } else {
+
+    }
+  } catch (error) {
     console.log(error);
   }
-      
-} catch (error) {
-  console.log(error);
+
+
 }
-   
-       posts.innerHTML += `
+async function editPost(event, id) {
+  var card = event.target.parentNode.parentNode
+  var title = card.children[1].children[0].children[0].children[0].innerText
+  var description = card.children[1].children[0].children[1].innerText
+  document.getElementById("title").value = title
+  document.getElementById("description").value = description
+  editId = id
+ 
+  // document.getElementById(post_btn).innerText = 'update post'
+
+  console.log(title, description);
+  card.remove()
+}
+async function post() {
+  var title = document.getElementById("title")
+  var description = document.getElementById("description")
+  console.log(title.value, description.value);
+  var posts = document.getElementById("posts")
+  if (title.value.trim() && description.value.trim()) {
+    try {
+
+      if (editId !== null) {
+        const { data, error } = await supabase
+          .from('Post App Table')
+          .update({ title : title.value, description : description.value, img_bg: cardBg })
+          .eq('id', editId)
+          .select()
+          window.location.reload()
+          if (error) {
+            console.log(error);
+          }
+      } else {
+        const { data, error } = await supabase
+          .from('Post App Table')
+          .insert({ title: title.value, description: description.value, img_bg: cardBg })
+          .select('*')
+        window.location.reload()
+        if (error) {
+          console.log(error);
+        }
+      }
+    
+
+    } catch (error) {
+      console.log(error);
+    }
+
+    posts.innerHTML += `
      <div class="card mb-2">
               <div class="card-header">~Post</div>
               <div style="background-image:url(${cardBg})" class="card-body">
@@ -99,26 +131,26 @@ try {
               </div>
             </div>
     `
-   
-    
-   }else{
+
+
+  } else {
     Swal.fire({
-  icon: "error",
-  title: "Oops...",
-  text: "Title & description can't be empty!",
-});
-   }
-    title.value = ""
-    description.value = ""
+      icon: "error",
+      title: "Oops...",
+      text: "Title & description can't be empty!",
+    });
+  }
+  title.value = ""
+  description.value = ""
 }
-function selectImg(src){
-    cardBg = src
-    console.log(src, event.target.classList);
-    // event.target.className += " selectedImg"
-    var bgImg = document.getElementsByClassName("bgImg")
-    for(var i = 0; i<bgImg.length; i++){
-        console.log(bgImg[i].className);
-        bgImg[i].className = "bgImg"
-    }
-    event.target.classList.add("selectedImg")
+function selectImg(src) {
+  cardBg = src
+  console.log(src, event.target.classList);
+  // event.target.className += " selectedImg"
+  var bgImg = document.getElementsByClassName("bgImg")
+  for (var i = 0; i < bgImg.length; i++) {
+    console.log(bgImg[i].className);
+    bgImg[i].className = "bgImg"
+  }
+  event.target.classList.add("selectedImg")
 }
