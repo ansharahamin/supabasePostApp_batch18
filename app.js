@@ -71,7 +71,7 @@ async function editPost(event, id) {
   document.getElementById("description").value = description
   editId = id
  
-  // document.getElementById(post_btn).innerText = 'update post'
+  document.getElementById("post_btn").innerText = 'update post'
 
   console.log(title, description);
   card.remove()
@@ -110,27 +110,8 @@ async function post() {
       console.log(error);
     }
 
-    posts.innerHTML += `
-     <div class="card mb-2">
-              <div class="card-header">~Post</div>
-              <div style="background-image:url(${cardBg})" class="card-body">
-                <figure>
-                  <blockquote class="blockquote">
-                    <p>
-                      ${title.value}
-                    </p>
-                  </blockquote>
-                  <figcaption class="blockquote-footer">
-                    ${description.value}
-                  </figcaption>
-                </figure>
-              </div>
-              <div class="ms-auto m-2">
-              <button onclick="editPost()" class="btn btn-success">Edit</button>
-              <button onclick="deletePost()" class="btn btn-danger">Delete</button>
-              </div>
-            </div>
-    `
+    location.reload()
+
 
 
   } else {
