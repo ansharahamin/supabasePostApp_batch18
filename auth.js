@@ -1,5 +1,7 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
-
+const supabase_url = "https://phgbkzvxbefidcrtagbt.supabase.co"
+const supabase_key = "sb_publishable_xbv5T3RlyRtRymBO3pY69A_lTr1vU0s"
+const supabase = createClient(supabase_url, supabase_key)
 async function register(){
     event.preventDefault()
     var name = document.getElementById("name").value
@@ -21,35 +23,27 @@ async function register(){
         alert("Passwords should be identical")
     }else{
         // localStorage.setItem("data",JSON.stringify(data))
-        alert(name+" Registered Successfully")
-        window.location.href="/dashboard.html"
-    }
-    try {
+            try {
         const { data, error } = await supabase.auth.signUp({
-            email: 'example@email.com',
-            password: 'example-password',
+            email: email,
+            password: password,
           })
+          console.log(data);
+          window.location.href="/dashboard.html"
           if (error) {
             alert(error);
           }
     } catch (error) {
-        console.log(error);
+        console.log(error.email);
     }
+        alert(name+" Registered Successfully")
+        // window.location.href="/dashboard.html"
+    }
+
  
 
 }
-// function renderData(){
-    
-//     var getData = JSON.parse(localStorage.getItem("data"))
-//     // console.log(getData);
-//    var displayData = document.getElementById("displayData")
-//    displayData.innerHTML=`
-//       <li> Name: ${getData.name}</li>
-//       <li> Email: ${getData.email}</li>
-//       <li> Phone: ${getData.phone}</li>
-//    `
-// }
-// renderData()
+
 
 async function login(){
     event.preventDefault()
@@ -61,28 +55,20 @@ try {
         password: loginPass,
       })
       console.log(data);
+      window.location.href="/dashboard.html"
       if (error) {
         alert(error)
       }
 } catch (error) {
     console.log(error);
 }
-    // var getData = JSON.parse(localStorage.getItem("data"))
-    // console.log(loginEmail,getData.email, loginPass,getData.password);
-    // if(getData.email !== loginEmail){
-    //     alert("Invalid Email")
-    // }else if(getData.password !== loginPass){
-    //     alert("Invalid Password")
-    // }else{
-    //     alert("Login Successful")
-    //     window.location.href="/dashboard.html"
-    // }
+
 
 }
 function logout(){
     window.location.href = "/"
 }
 
-window.register = register()
-window.login = login()
-window.logout = logout()
+window.register = register;
+window.login = login;
+window.logout = logout;
