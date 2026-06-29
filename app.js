@@ -46,6 +46,55 @@ window.onload = async function () {
 
 }
 
+async function search() {
+  var searchInput = document.getElementById('searchInput').value
+  
+  try {
+    const { data, error } = await supabase
+    .from('Post App Table')
+    .select('*').order('id', { ascending: false })
+    .ilike('title', `%${searchInput}%`)
+    console.log(data);
+    
+    if (error) {
+      console.log(error);
+    }
+    var posts = document.getElementById("posts")
+    posts.innerHTML = ''
+    data.forEach(post => {
+     
+
+      posts.innerHTML += `
+    <div class="card mb-2">
+             <div class="card-header">${post.id} ~Post</div>
+             <div style="background-image:url(${post.img_bg})" class="card-body">
+               <figure>
+                 <blockquote class="blockquote">
+                   <p>
+                     ${post.title}
+                   </p>
+                 </blockquote>
+                 <figcaption class="blockquote-footer">
+                   ${post.description}
+                 </figcaption>
+               </figure>
+             </div>
+             <div class="ms-auto m-2">
+             <button onclick="editPost(event,${post.id})" class="btn btn-success">Edit</button>
+             <button onclick="deletePost(event,${post.id})" class="btn btn-danger">Delete</button>
+             </div>
+           </div>
+   `
+    });
+  } catch (error) {
+    console.log(error);
+  }
+ 
+}
+
+function logout(){
+  window.location.href = "/"
+}
 
 async function deletePost(event, id) {
   var card = event.target.parentNode.parentNode

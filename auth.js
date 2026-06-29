@@ -2,6 +2,18 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 const supabase_url = "https://phgbkzvxbefidcrtagbt.supabase.co"
 const supabase_key = "sb_publishable_xbv5T3RlyRtRymBO3pY69A_lTr1vU0s"
 const supabase = createClient(supabase_url, supabase_key)
+
+supabase.auth.onAuthStateChange((event, session) => {
+    console.log(event, session);
+  
+    if (event === 'INITIAL_SESSION') {
+alert(name + `welcome to our website`)
+}else if (event === 'SIGNED_IN') {
+      alert(name + " hello")
+      } else if (event === 'SIGNED_OUT') {
+       alert(name + "Goodbye you can always come next time")
+  }}); 
+
 async function register(){
     event.preventDefault()
     var name = document.getElementById("name").value
@@ -36,7 +48,7 @@ async function register(){
     } catch (error) {
         console.log(error.email);
     }
-        alert(name+" Registered Successfully")
+        
         // window.location.href="/dashboard.html"
     }
 
@@ -65,10 +77,7 @@ try {
 
 
 }
-function logout(){
-    window.location.href = "/"
-}
+
 
 window.register = register;
 window.login = login;
-window.logout = logout;
